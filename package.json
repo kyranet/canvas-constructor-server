@@ -1,0 +1,29 @@
+{
+  "name": "canvas-constructor-server",
+  "version": "1.0.0",
+  "description": "A canvas-constructor based API for image generation and microservicing.",
+  "main": "dist/main.js",
+  "repository": "https://github.com/kyranet/canvas-constructor-server",
+  "author": "Antonio Román <kyradiscord@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --ext ts src --fix",
+    "test:lint": "eslint --ext ts src",
+    "build": "tsc -p .",
+    "watch": "tsc -p . -w",
+    "start": "node dist/main.js"
+  },
+  "devDependencies": {
+    "@types/node": "^12.0.7",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
+    "eslint": "^5.16.0",
+    "eslint-config-klasa": "dirigeants/klasa-lint",
+    "typescript": "^3.5.1"
+  },
+  "dependencies": {
+    "canvas": "^2.5.0",
+    "canvas-constructor": "^3.0.3"
+  }
+}
