@@ -18,14 +18,14 @@ export class Worker extends EventEmitter {
 	}
 
 	private async process(request: http.IncomingMessage, response: http.ServerResponse): Promise<void> {
+		response.setHeader('Access-Control-Allow-Origin', '*');
+		response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+		response.setHeader('Access-Control-Allow-Headers', '*');
+
 		if (request.method !== 'POST') {
 			response.writeHead(405, { 'Content-Type': 'application/json' });
 			return response.end('{"success":false,"reason": "Method Not Allowed"}');
 		}
-
-		response.setHeader('Access-Control-Allow-Origin', '*');
-		response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-		response.setHeader('Access-Control-Allow-Headers', '*');
 
 		const body = await extractBody<Message>(request);
 		if (!body) {
@@ -82,12 +82,4 @@ export enum CommandKind {
 	Filter
 }
 
-export type Filter = 'invert' |
-'greyscale' |
-'sepia' |
-'silhouette' |
-'threshold' |
-'invertedThreshold' |
-'sharpen' |
-'blur' |
-'convolute';
+export type Filter = 'invert' | 'greyscale' | 'sepia' | 'silhouette' | 'threshold' | 'invertedThreshold' | 'sharpen' | 'blur' | 'convolute';
