@@ -1,3 +1,6 @@
 {
-	"extends": "klasa/eslint-ts"
+    "extends": "klasa/eslint-ts",
+    "rules": {
+        "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }]
+    }
 }

@@ -12,10 +12,14 @@ export async function extractBody<T extends {}>(request: IncomingMessage): Promi
 
 	let body = '';
 	for await (const chunk of stream) body += chunk;
-	return JSON.parse(body);
+	try {
+		return JSON.parse(body);
+	} catch {
+		return null;
+	}
 }
 
-function contentStream(request: IncomingMessage) {
+function contentStream(request: IncomingMessage): Inflate | Gunzip | IncomingMessage | null {
 	let stream: Inflate | Gunzip | IncomingMessage | null;
 	switch ((request.headers['content-encoding'] || 'identity').toLowerCase()) {
 		case 'deflate':

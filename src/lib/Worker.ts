@@ -8,26 +8,29 @@ import { extractBody } from './util/ResponseBody';
 const { Canvas, ...methods } = CC;
 
 export class Worker extends EventEmitter {
+
 	public server: http.Server;
 	public constructor(port: number = 8000) {
 		super();
 
-		this.server = http.createServer(
-			(request, response) => this.process(request, response));
+		this.server = http.createServer(this.process.bind(this));
 		this.server.listen(port, () => this.emit('ready'));
 	}
 
-	private async process(request: http.IncomingMessage, response: http.ServerResponse) {
+	private async process(request: http.IncomingMessage, response: http.ServerResponse): Promise<void> {
 		response.setHeader('Access-Control-Allow-Origin', '*');
-		response.setHeader('Access-Control-Allow-Methods', 'DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT');
-		response.setHeader('Access-Control-Allow-Headers', 'Authorization, User-Agent, Content-Type');
+		response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+		response.setHeader('Access-Control-Allow-Headers', '*');
+
+		if (request.method !== 'POST') {
+			response.writeHead(405, { 'Content-Type': 'application/json' });
+			return response.end('{"success":false,"reason": "Method Not Allowed"}');
+		}
 
 		const body = await extractBody<Message>(request);
 		if (!body) {
-			response.setHeader('Content-Type', 'application/json');
-			response.writeHead(400);
-			response.end('{"success":false,"reason":"Failed to read JSON body."}');
-			return;
+			response.writeHead(400, { 'Content-Type': 'application/json' });
+			return response.end('{"success":false,"reason":"Failed to read JSON body."}');
 		}
 
 		try {
@@ -42,16 +45,15 @@ export class Worker extends EventEmitter {
 				}
 			}
 			const buffer = await canvas.toBufferAsync();
-			response.setHeader('Content-Type', 'image/png');
-			response.writeHead(200);
-			response.write(buffer, 'binary');
-			response.end(null, 'binary');
+
+			response.writeHead(200, { 'Content-Type': 'image/png' });
+			return response.end(buffer, 'binary');
 		} catch (error) {
-			response.setHeader('Content-Type', 'application/json');
-			response.writeHead(500);
-			response.end(JSON.stringify({ success: false, reason: error.message }));
+			response.writeHead(500, { 'Content-Type': 'application/json' });
+			return response.end(JSON.stringify({ success: false, reason: error.message }));
 		}
 	}
+
 }
 
 export interface Message {
@@ -80,12 +82,4 @@ export enum CommandKind {
 	Filter
 }
 
-export type Filter = 'invert' |
-	'greyscale' |
-	'sepia' |
-	'silhouette' |
-	'threshold' |
-	'invertedThreshold' |
-	'sharpen' |
-	'blur' |
-	'convolute';
+export type Filter = 'invert' | 'greyscale' | 'sepia' | 'silhouette' | 'threshold' | 'invertedThreshold' | 'sharpen' | 'blur' | 'convolute';
