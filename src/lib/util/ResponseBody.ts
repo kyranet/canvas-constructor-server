@@ -14,7 +14,7 @@ export async function extractBody<T extends {}>(request: IncomingMessage): Promi
 	for await (const chunk of stream) body += chunk;
 	try {
 		return JSON.parse(body);
-	} catch (noop) {
+	} catch {
 		return null;
 	}
 }
