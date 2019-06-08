@@ -14,7 +14,7 @@ export class Cluster extends EventEmitter {
 		this.emit('ready');
 	}
 
-	public get(): cluster.Worker {
+	public get worker(): cluster.Worker {
 		return cluster.worker;
 	}
 
